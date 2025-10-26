@@ -1,13 +1,12 @@
 import 'dart:io';
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:naseej/component/crud.dart';
 import 'package:naseej/core/constant/links.dart';
+import 'package:naseej/core/constant/color.dart';
 import 'package:naseej/main.dart';
 import 'package:naseej/component/button.dart';
 import 'package:naseej/component/textformfield.dart';
-
 import '../l10n/generated/app_localizations.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -21,7 +20,6 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   TextEditingController nameController = TextEditingController();
-
   Crud crud = Crud();
   bool isLoading = false;
   bool isLoadingImage = false;
@@ -94,15 +92,17 @@ class _ProfilePageState extends State<ProfilePage> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(l10n.profileImageUpdatedSuccessfully),
-              backgroundColor: Colors.green,
+              backgroundColor: AppColor.successColor,
+              behavior: SnackBarBehavior.floating,
             ),
           );
-          _loadUserProfile(); // Reload profile data to get new image
+          _loadUserProfile();
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(l10n.failedToUpdateProfileImage),
-              backgroundColor: Colors.red,
+              backgroundColor: AppColor.warningColor,
+              behavior: SnackBarBehavior.floating,
             ),
           );
         }
@@ -114,89 +114,66 @@ class _ProfilePageState extends State<ProfilePage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(l10n.errorPickingImage),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColor.warningColor,
+          behavior: SnackBarBehavior.floating,
         ),
       );
     }
   }
 
   void _showImagePickerDialog() {
+    final l10n = AppLocalizations.of(context);
+
     showModalBottomSheet(
       context: context,
+      backgroundColor: AppColor.cardBackground,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
       ),
       builder: (BuildContext context) {
-        final l10n = AppLocalizations.of(context);
         return Container(
-          padding: EdgeInsets.all(20),
+          padding: EdgeInsets.all(24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                l10n.updateProfileImage,
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppColor.borderGray,
+                  borderRadius: BorderRadius.circular(2),
                 ),
               ),
               SizedBox(height: 20),
+              Text(
+                l10n.updateProfileImage,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: AppColor.primaryColor,
+                ),
+              ),
+              SizedBox(height: 24),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  InkWell(
+                  _buildImageOption(
+                    icon: Icons.camera_alt,
+                    label: l10n.camera,
+                    color: AppColor.primaryColor,
                     onTap: () {
                       Navigator.pop(context);
                       _updateProfileImage(ImageSource.camera);
                     },
-                    child: Container(
-                      padding: EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: Colors.blue[50],
-                        borderRadius: BorderRadius.circular(15),
-                        border: Border.all(color: Colors.blue[200]!),
-                      ),
-                      child: Column(
-                        children: [
-                          Icon(Icons.camera_alt, size: 40, color: Colors.blue),
-                          SizedBox(height: 8),
-                          Text(
-                            l10n.camera,
-                            style: TextStyle(
-                              color: Colors.blue,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
                   ),
-                  InkWell(
+                  _buildImageOption(
+                    icon: Icons.photo_library,
+                    label: l10n.gallery,
+                    color: AppColor.goldAccent,
                     onTap: () {
                       Navigator.pop(context);
                       _updateProfileImage(ImageSource.gallery);
                     },
-                    child: Container(
-                      padding: EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: Colors.green[50],
-                        borderRadius: BorderRadius.circular(15),
-                        border: Border.all(color: Colors.green[200]!),
-                      ),
-                      child: Column(
-                        children: [
-                          Icon(Icons.photo_library, size: 40, color: Colors.green),
-                          SizedBox(height: 8),
-                          Text(
-                            l10n.gallery,
-                            style: TextStyle(
-                              color: Colors.green,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
                   ),
                 ],
               ),
@@ -208,13 +185,48 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  Widget _buildImageOption({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: color.withOpacity(0.3), width: 2),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, size: 32, color: color),
+            SizedBox(height: 8),
+            Text(
+              label,
+              style: TextStyle(
+                color: color,
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   updateProfile() async {
     final l10n = AppLocalizations.of(context);
     if (nameController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(l10n.nameCannotBeEmpty),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColor.warningColor,
+          behavior: SnackBarBehavior.floating,
         ),
       );
       return;
@@ -242,8 +254,9 @@ class _ProfilePageState extends State<ProfilePage> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(l10n.profileImageUpdatedSuccessfully),
-          backgroundColor: Colors.green,
+          content: Text(l10n.profileUpdatedSuccessfully),
+          backgroundColor: AppColor.successColor,
+          behavior: SnackBarBehavior.floating,
         ),
       );
 
@@ -252,7 +265,8 @@ class _ProfilePageState extends State<ProfilePage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(l10n.failedToUpdateProfile),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColor.warningColor,
+          behavior: SnackBarBehavior.floating,
         ),
       );
     }
@@ -261,271 +275,279 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
     if (isLoading) {
       return Scaffold(
+        backgroundColor: isDark ? Color(0xFF1A1614) : AppColor.backgroundcolor,
         appBar: AppBar(
           title: Text(l10n.profile),
-          backgroundColor: Theme.of(context).colorScheme.primary,
+          backgroundColor: AppColor.primaryColor,
           foregroundColor: Colors.white,
         ),
-        body: Center(child: CircularProgressIndicator()),
+        body: Center(
+          child: CircularProgressIndicator(color: AppColor.primaryColor),
+        ),
       );
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.profile),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Colors.white,
-        elevation: 0,
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              SizedBox(height: 20),
+      backgroundColor: isDark ? Color(0xFF1A1614) : AppColor.backgroundcolor,
+      body: CustomScrollView(
+        slivers: [
+          // App Bar with Gradient
+          SliverAppBar(
+            expandedHeight: 200,
+            floating: false,
+            pinned: true,
+            backgroundColor: AppColor.primaryColor,
+            iconTheme: IconThemeData(color: Colors.white),
+            flexibleSpace: FlexibleSpaceBar(
+              centerTitle: true,
+              title: Text(
+                l10n.profile,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                ),
+              ),
+              background: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      AppColor.primaryColor,
+                      AppColor.secondColor,
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
 
-              // Profile Image Section
-              GestureDetector(
-                onTap: _showImagePickerDialog,
-                child: Stack(
-                  children: [
-                    Container(
-                      width: 120,
-                      height: 120,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Theme.of(context).colorScheme.primary,
-                          width: 3,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 10,
-                            offset: Offset(0, 5),
-                          ),
-                        ],
-                      ),
-                      child: ClipOval(
-                        child: isLoadingImage
-                            ? Container(
-                          color: Colors.grey[200],
-                          child: Center(
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                Theme.of(context).colorScheme.primary,
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.all(20),
+              child: Column(
+                children: [
+                  // Profile Image Section - FIXED DESIGN
+                  Transform.translate(
+                    offset: Offset(0, -50),
+                    child: GestureDetector(
+                      onTap: _showImagePickerDialog,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          // Gradient border
+                          Container(
+                            width: 130,
+                            height: 130,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: LinearGradient(
+                                colors: [AppColor.primaryColor, AppColor.goldAccent],
                               ),
                             ),
                           ),
-                        )
-                            : (currentProfile != null &&
-                            currentProfile!['profile_image'] != null &&
-                            currentProfile!['profile_image'].toString().isNotEmpty)
-                            ? Image.network(
-                          profileImageBaseUrl + currentProfile!['profile_image'],
-                          width: 120,
-                          height: 120,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            print("${l10n.errorPickingImage}: $error");
-                            return _buildDefaultAvatar();
-                          },
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return Container(
-                              color: Colors.grey[200],
-                              child: Center(
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  value: loadingProgress.expectedTotalBytes != null
-                                      ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
-                                      : null,
-                                ),
+                          // White ring
+                          Container(
+                            width: 124,
+                            height: 124,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: isDark ? Color(0xFF1A1614) : Colors.white,
+                            ),
+                          ),
+                          // Image
+                          Container(
+                            width: 120,
+                            height: 120,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              boxShadow: [BoxShadow(color: AppColor.primaryColor.withOpacity(0.3), blurRadius: 20, offset: Offset(0, 10))],
+                            ),
+                            child: ClipOval(
+                              child: isLoadingImage
+                                  ? Container(color: AppColor.backgroundcolor2, child: Center(child: CircularProgressIndicator(color: AppColor.primaryColor, strokeWidth: 3)))
+                                  : (currentProfile != null && currentProfile!['profile_image'] != null && currentProfile!['profile_image'].toString().isNotEmpty)
+                                  ? Image.network(profileImageBaseUrl + currentProfile!['profile_image'], width: 120, height: 120, fit: BoxFit.cover,
+                                  errorBuilder: (_, __, ___) => _buildDefaultAvatar(),
+                                  loadingBuilder: (_, child, progress) => progress == null ? child : Container(color: AppColor.backgroundcolor2, child: Center(child: CircularProgressIndicator(color: AppColor.primaryColor, strokeWidth: 3))))
+                                  : _buildDefaultAvatar(),
+                            ),
+                          ),
+                          // Edit button
+                          Positioned(
+                            bottom: 0,
+                            right: 0,
+                            child: Container(
+                              padding: EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(colors: [AppColor.primaryColor, AppColor.goldAccent]),
+                                shape: BoxShape.circle,
+                                border: Border.all(color: isDark ? Color(0xFF1A1614) : Colors.white, width: 3),
+                                boxShadow: [BoxShadow(color: AppColor.primaryColor.withOpacity(0.4), blurRadius: 8, offset: Offset(0, 4))],
                               ),
-                            );
-                          },
-                        )
-                            : _buildDefaultAvatar(),
+                              child: Icon(Icons.camera_alt, size: 18, color: Colors.white),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: Container(
-                        padding: EdgeInsets.all(6),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.primary,
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 2),
+                  ),
+
+                  // Edit Name Section
+                  Container(
+                    padding: EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: isDark ? Color(0xFF2C2520) : AppColor.cardBackground,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColor.primaryColor.withOpacity(0.08),
+                          blurRadius: 12,
+                          offset: Offset(0, 4),
                         ),
-                        child: Icon(
-                          Icons.camera_alt,
-                          size: 18,
-                          color: Colors.white,
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: AppColor.primaryColor.withOpacity(0.15),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Icon(Icons.edit, color: AppColor.primaryColor, size: 22),
+                            ),
+                            SizedBox(width: 12),
+                            Text(
+                              l10n.editYourName,
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: AppColor.primaryColor,
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
+                        SizedBox(height: 20),
+
+                        Text(
+                          l10n.fullName,
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        SizedBox(height: 10),
+                        CustomTextForm(
+                          hintText: l10n.enterFullName,
+                          controller: nameController,
+                        ),
+
+                        SizedBox(height: 24),
+
+                        SizedBox(
+                          width: double.infinity,
+                          child: Button(
+                            title: l10n.updateName,
+                            isLoading: false,
+                            onpressed: updateProfile,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+
+                  SizedBox(height: 24),
+
+                  // Account Information Section
+                  Container(
+                    padding: EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: isDark ? Color(0xFF2C2520) : AppColor.backgroundcolor2,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: AppColor.borderGray),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(Icons.info_outline, color: AppColor.goldAccent, size: 24),
+                            SizedBox(width: 12),
+                            Text(
+                              l10n.accountInformation,
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: AppColor.goldAccent,
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 20),
+                        _buildInfoRow(l10n.email, sharedPref.getString("user_email") ?? l10n.noEmail),
+                        _buildInfoRow(l10n.created, _formatDate(currentProfile?['created_at'])),
+                        _buildInfoRow(l10n.accountStatus, l10n.active,
+                            valueColor: AppColor.successColor),
+                      ],
+                    ),
+                  ),
+
+                  SizedBox(height: 40),
+                ],
               ),
-
-              SizedBox(height: 20),
-
-              // User Name Display
-              Text(
-                currentProfile?['user_name'] ?? l10n.noName,
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-              ),
-
-              SizedBox(height: 8),
-
-              // Email Display
-              Text(
-                sharedPref.getString("user_email") ?? "",
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey[600],
-                ),
-              ),
-
-              SizedBox(height: 40),
-
-              // Edit Name Section
-              Container(
-                padding: EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(15),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
-                      offset: Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      l10n.editYourName,
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                    SizedBox(height: 15),
-
-                    Text(
-                      l10n.fullName,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    SizedBox(height: 8),
-                    CustomTextForm(
-                      hintText: l10n.enterFullName,
-                      controller: nameController,
-                    ),
-
-                    SizedBox(height: 25),
-
-                    SizedBox(
-                      width: double.infinity,
-                      child: Button(
-                        title: l10n.updateName,
-                        isLoading: false,
-                        onpressed: updateProfile,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              SizedBox(height: 30),
-
-              // Account Information Section
-              Container(
-                padding: EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.grey[50],
-                  borderRadius: BorderRadius.circular(15),
-                  border: Border.all(color: Colors.grey[200]!),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      l10n.accountInformation,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                    SizedBox(height: 15),
-                    _buildInfoRow(l10n.email, sharedPref.getString("user_email") ?? l10n.noEmail),
-                    _buildInfoRow(l10n.created, _formatDate(currentProfile?['created_at'])),
-                    _buildInfoRow(l10n.accountStatus, l10n.active),
-                  ],
-                ),
-              ),
-
-              SizedBox(height: 30),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
 
   Widget _buildDefaultAvatar() {
     return Container(
-      width: 120,
-      height: 120,
+      width: 140,
+      height: 140,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+        gradient: LinearGradient(
+          colors: [AppColor.primaryColor.withOpacity(0.3), AppColor.secondColor.withOpacity(0.3)],
+        ),
       ),
       child: Icon(
         Icons.person,
-        size: 50,
-        color: Theme.of(context).colorScheme.primary,
+        size: 60,
+        color: AppColor.primaryColor,
       ),
     );
   }
 
-  Widget _buildInfoRow(String label, String value) {
+  Widget _buildInfoRow(String label, String value, {Color? valueColor}) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 6),
+      padding: EdgeInsets.symmetric(vertical: 10),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            flex: 2,
-            child: Text(
-              label,
-              style: TextStyle(
-                color: Colors.grey[600],
-                fontSize: 14,
-              ),
+          Text(
+            label,
+            style: TextStyle(
+              color: AppColor.grey,
+              fontSize: 15,
+              fontWeight: FontWeight.w500,
             ),
           ),
-          Expanded(
-            flex: 3,
+          Flexible(
             child: Text(
               value,
               style: TextStyle(
-                fontWeight: FontWeight.w500,
-                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                fontSize: 15,
+                color: valueColor ?? AppColor.primaryColor,
               ),
               textAlign: TextAlign.right,
             ),

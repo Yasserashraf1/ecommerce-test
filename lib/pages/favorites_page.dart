@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:naseej/component/crud.dart';
 import 'package:naseej/core/constant/links.dart';
+import 'package:naseej/core/constant/color.dart';
 import 'package:naseej/main.dart';
 import 'package:naseej/utils/favorites_manager.dart';
-import 'package:naseej/component/cardnote.dart';
+import 'package:naseej/component/product_card.dart';
 import 'package:naseej/operations/notedetailpage.dart';
 import '../l10n/generated/app_localizations.dart';
 
@@ -19,7 +20,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
   List<Map<String, dynamic>> favoriteNotes = [];
   bool isLoading = true;
   String? error;
-  bool _hasChanges = false; // Track if favorites were modified
+  bool _hasChanges = false;
 
   @override
   void initState() {
@@ -34,23 +35,18 @@ class _FavoritesPageState extends State<FavoritesPage> {
     });
 
     try {
-      // Ensure FavoritesManager is initialized
       if (!FavoritesManager.isInitialized) {
         await FavoritesManager.initialize();
       }
 
-      // Get all user notes
       var response = await crud.postRequest(viewNoteLink, {
         "userId": sharedPref.getString("user_id")!
       });
 
       if (response["status"] == "success" && response["data"] != null) {
         List<dynamic> allNotes = response["data"];
-
-        // Get favorite note IDs using async method
         List<String> favoriteIds = await FavoritesManager.getFavoriteIds();
 
-        // Filter notes to only include favorites
         List<Map<String, dynamic>> filteredFavorites = [];
         for (var note in allNotes) {
           String noteId = note['note_id'].toString();
@@ -86,9 +82,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
   }
 
   void _onFavoriteChanged() {
-    _hasChanges = true; // Mark that changes occurred
-
-    // Reload favorites when a note's favorite status changes with a small delay
+    _hasChanges = true;
     Future.delayed(Duration(milliseconds: 300), () {
       if (mounted) {
         _loadFavoriteNotes();
@@ -99,17 +93,18 @@ class _FavoritesPageState extends State<FavoritesPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
     return WillPopScope(
       onWillPop: () async {
-        // Return the result when navigating back
         Navigator.of(context).pop(_hasChanges);
         return false;
       },
       child: Scaffold(
+        backgroundColor: isDark ? Color(0xFF1A1614) : AppColor.backgroundcolor,
         appBar: AppBar(
           title: Text(l10n.favorites),
-          backgroundColor: Theme.of(context).colorScheme.primary,
+          backgroundColor: AppColor.primaryColor,
           foregroundColor: Colors.white,
           leading: IconButton(
             icon: Icon(Icons.arrow_back),
@@ -118,54 +113,78 @@ class _FavoritesPageState extends State<FavoritesPage> {
             },
           ),
           actions: [
-            // Show favorites count
             if (favoriteNotes.isNotEmpty)
               Center(
                 child: Container(
                   margin: EdgeInsets.only(right: 16),
-                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(15),
+                    color: AppColor.goldAccent,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColor.goldAccent.withOpacity(0.4),
+                        blurRadius: 8,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
                   ),
                   child: Text(
                     "${favoriteNotes.length}",
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
+                      fontSize: 14,
                     ),
                   ),
                 ),
               ),
           ],
         ),
-        body: Container(
-          padding: EdgeInsets.all(10),
-          child: _buildBody(),
-        ),
+        body: _buildBody(),
       ),
     );
   }
 
   Widget _buildBody() {
     if (isLoading) {
-      return Center(child: CircularProgressIndicator());
+      return Center(
+        child: CircularProgressIndicator(
+          color: AppColor.primaryColor,
+          strokeWidth: 3,
+        ),
+      );
     }
 
     if (error != null) {
       return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.error_outline, size: 64, color: Colors.red),
-            SizedBox(height: 16),
-            Text(error!, style: TextStyle(fontSize: 16, color: Colors.red)),
-            SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: _loadFavoriteNotes,
-              child: Text("Retry"),
-            ),
-          ],
+        child: Padding(
+          padding: EdgeInsets.all(40),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.error_outline, size: 64, color: AppColor.warningColor),
+              SizedBox(height: 16),
+              Text(
+                error!,
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 16, color: AppColor.warningColor),
+              ),
+              SizedBox(height: 24),
+              ElevatedButton.icon(
+                onPressed: _loadFavoriteNotes,
+                icon: Icon(Icons.refresh),
+                label: Text("Retry"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColor.primaryColor,
+                  padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       );
     }
@@ -176,7 +195,15 @@ class _FavoritesPageState extends State<FavoritesPage> {
 
     return RefreshIndicator(
       onRefresh: _loadFavoriteNotes,
-      child: ListView.builder(
+      color: AppColor.primaryColor,
+      child: GridView.builder(
+        padding: EdgeInsets.all(16),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          childAspectRatio: 0.75,
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 16,
+        ),
         itemCount: favoriteNotes.length,
         itemBuilder: (context, index) {
           final note = favoriteNotes[index];
@@ -187,7 +214,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
             imageUrl = imageBaseUrl + note['note_image'];
           }
 
-          return CardNote(
+          return ProductCard(
             key: ValueKey('favorite_note_${note['note_id']}_$index'),
             noteId: note['note_id'].toString(),
             onTap: () async {
@@ -227,94 +254,131 @@ class _FavoritesPageState extends State<FavoritesPage> {
     final l10n = AppLocalizations.of(context);
 
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // Animated heart icon
-          TweenAnimationBuilder<double>(
-            duration: Duration(seconds: 2),
-            tween: Tween<double>(begin: 0.8, end: 1.1),
-            builder: (context, value, child) {
-              return Transform.scale(
-                scale: value,
-                child: Icon(
-                  Icons.favorite_border,
-                  size: 80,
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? Colors.grey[600]
-                      : Colors.grey[400],
-                ),
-              );
-            },
-            onEnd: () {
-              // Optional: Add continuous animation
-            },
-          ),
-          SizedBox(height: 24),
-          Text(
-            l10n.noFavoritesYet,
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.w600,
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? Colors.grey[300]
-                  : Colors.grey[600],
-            ),
-          ),
-          SizedBox(height: 12),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 40),
-            child: Text(
-              l10n.markFavorites,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16,
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.grey[400]
-                    : Colors.grey[500],
-                height: 1.4,
-              ),
-            ),
-          ),
-          SizedBox(height: 30),
-
-          // Instruction card
-          Container(
-            margin: EdgeInsets.symmetric(horizontal: 30),
-            padding: EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? Colors.grey[800]
-                  : Colors.grey[50],
-              borderRadius: BorderRadius.circular(15),
-              border: Border.all(
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.grey[700]!
-                    : Colors.grey[200]!,
-              ),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.favorite,
-                  color: Colors.pink,
-                  size: 24,
-                ),
-                SizedBox(width: 15),
-                Expanded(
-                  child: Text(
-                    l10n.noFavoritesDescription,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Theme.of(context).textTheme.bodyMedium?.color,
-                      height: 1.4,
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.all(40),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Animated heart icon
+              TweenAnimationBuilder<double>(
+                duration: Duration(seconds: 2),
+                tween: Tween<double>(begin: 0.8, end: 1.1),
+                curve: Curves.easeInOut,
+                builder: (context, value, child) {
+                  return Transform.scale(
+                    scale: value,
+                    child: Container(
+                      padding: EdgeInsets.all(40),
+                      decoration: BoxDecoration(
+                        color: AppColor.cardBackground,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.pink.withOpacity(0.2),
+                            blurRadius: 20,
+                            offset: Offset(0, 10),
+                          ),
+                        ],
+                      ),
+                      child: Icon(
+                        Icons.favorite_border,
+                        size: 80,
+                        color: Colors.pink.withOpacity(0.6),
+                      ),
                     ),
+                  );
+                },
+              ),
+              SizedBox(height: 32),
+              Text(
+                l10n.noFavoritesYet,
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: AppColor.primaryColor,
+                ),
+              ),
+              SizedBox(height: 12),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                child: Text(
+                  l10n.markFavorites,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: AppColor.grey,
+                    height: 1.5,
                   ),
                 ),
-              ],
-            ),
+              ),
+              SizedBox(height: 32),
+
+              // Instruction card
+              Container(
+                padding: EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.pink.withOpacity(0.1),
+                      AppColor.primaryColor.withOpacity(0.1),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: Colors.pink.withOpacity(0.3),
+                    width: 2,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.pink.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Icon(
+                        Icons.favorite,
+                        color: Colors.pink,
+                        size: 28,
+                      ),
+                    ),
+                    SizedBox(width: 16),
+                    Expanded(
+                      child: Text(
+                        l10n.noFavoritesDescription,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: AppColor.grey,
+                          height: 1.4,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              SizedBox(height: 32),
+
+              // Back to Notes Button
+              ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.of(context).pop(_hasChanges);
+                },
+                icon: Icon(Icons.arrow_back),
+                label: Text(l10n.backToNotes),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColor.primaryColor,
+                  padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

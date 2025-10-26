@@ -3,6 +3,7 @@ import 'package:naseej/auth/register.dart';
 import 'package:naseej/pages/MyHomePage.dart';
 import 'package:naseej/onboarding/onboarding.dart';
 import 'package:get/get.dart';
+import 'package:naseej/pages/shop_page.dart';
 
 List<GetPage<dynamic>>? routes = [
   // Onboarding route
@@ -14,4 +15,8 @@ List<GetPage<dynamic>>? routes = [
 
   // Home route
   GetPage(name: "/home", page: () => const MyHomePage()),
+
+  // Direct page access
+  GetPage(name: "/shop", page: () => const ShopPage(category: 'All')),
+
 ];

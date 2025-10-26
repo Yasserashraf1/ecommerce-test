@@ -2,164 +2,313 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:naseej/core/constant/links.dart';
+import 'package:naseej/core/constant/color.dart';
 import '../l10n/generated/app_localizations.dart';
 
 class AboutPage extends StatelessWidget {
   const AboutPage({Key? key}) : super(key: key);
 
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
+      backgroundColor: isDark ? Color(0xFF1A1614) : AppColor.backgroundcolor,
       appBar: AppBar(
         title: Text(l10n.aboutCreator),
-        backgroundColor: Theme.of(context).colorScheme.primary,
+        backgroundColor: AppColor.primaryColor,
         foregroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(20),
+        padding: EdgeInsets.all(24),
         child: Column(
           children: [
-            SizedBox(height: 40),
-
-            // Profile Image
-            CircleAvatar(
-              radius: 60,
-              backgroundImage: AssetImage("images/profile.jpg"),
-              backgroundColor: Colors.transparent,
-            ),
-
-            SizedBox(height: 20),
-            Text(
-              l10n.myName,
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-            ),
-            SizedBox(height: 10),
-            Text(
-              l10n.subtitle,
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey[600],
-              ),
-            ),
-
             SizedBox(height: 20),
 
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+            // Profile Image with Decorative Circle
+            Stack(
+              alignment: Alignment.center,
               children: [
-                _buildSocialIcon(FontAwesomeIcons.linkedin, linkedinUrl, context),
-                SizedBox(width: 20),
-                _buildSocialIcon(FontAwesomeIcons.globe, websiteUrl, context),
-                SizedBox(width: 20),
-                _buildSocialIcon(FontAwesomeIcons.whatsapp, whatsappUrl, context),
-                SizedBox(width: 20),
-                _buildSocialIcon(FontAwesomeIcons.envelope, gmailUrl, context),
+                Container(
+                  width: 160,
+                  height: 160,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      colors: [
+                        AppColor.primaryColor.withOpacity(0.3),
+                        AppColor.goldAccent.withOpacity(0.3),
+                      ],
+                    ),
+                  ),
+                ),
+                Container(
+                  width: 140,
+                  height: 140,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: AppColor.goldAccent,
+                      width: 3,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColor.primaryColor.withOpacity(0.3),
+                        blurRadius: 20,
+                        offset: Offset(0, 10),
+                      ),
+                    ],
+                  ),
+                  child: ClipOval(
+                    child: Image.asset(
+                      "images/profile.jpg",
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
               ],
             ),
 
-            SizedBox(height: 30),
+            SizedBox(height: 24),
+            Text(
+              l10n.myName,
+              style: TextStyle(
+                fontSize: 26,
+                fontWeight: FontWeight.bold,
+                color: AppColor.primaryColor,
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              l10n.subtitle,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16,
+                color: AppColor.grey,
+                height: 1.4,
+              ),
+            ),
 
-            // About App Section
+            SizedBox(height: 32),
+
+            // Social Icons
             Container(
               padding: EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.grey[50],
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.grey[200]!),
+                color: isDark ? Color(0xFF2C2520) : AppColor.cardBackground,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColor.primaryColor.withOpacity(0.08),
+                    blurRadius: 12,
+                    offset: Offset(0, 4),
+                  ),
+                ],
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Text(
-                  l10n.aboutThisApp,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
+                  _buildSocialIcon(
+                    FontAwesomeIcons.linkedin,
+                    linkedinUrl,
+                    Color(0xFF0077B5),
+                    context,
                   ),
-                  SizedBox(height: 10),
-                  Text(
-                    l10n.appDescription,
-                    style: TextStyle(height: 1.5),
+                  _buildSocialIcon(
+                    FontAwesomeIcons.globe,
+                    websiteUrl,
+                    AppColor.primaryColor,
+                    context,
                   ),
-                  SizedBox(height: 10),
-                  _buildFeatureItem("${l10n.feature1}"),
-                  _buildFeatureItem("${l10n.feature2}"),
-                  _buildFeatureItem("${l10n.feature3}"),
-                  _buildFeatureItem("${l10n.feature4}"),
-                  _buildFeatureItem("${l10n.feature5}"),
+                  _buildSocialIcon(
+                    FontAwesomeIcons.whatsapp,
+                    whatsappUrl,
+                    Color(0xFF25D366),
+                    context,
+                  ),
+                  _buildSocialIcon(
+                    FontAwesomeIcons.envelope,
+                    gmailUrl,
+                    Color(0xFFEA4335),
+                    context,
+                  ),
                 ],
               ),
             ),
 
-            SizedBox(height: 30),
+            SizedBox(height: 32),
 
-            // Contact Section
+            // About App Section
             Container(
-              padding: EdgeInsets.all(16),
+              padding: EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
+                gradient: LinearGradient(
+                  colors: [
+                    AppColor.primaryColor.withOpacity(0.1),
+                    AppColor.goldAccent.withOpacity(0.1),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: AppColor.primaryColor.withOpacity(0.3),
+                  width: 2,
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: AppColor.primaryColor,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColor.primaryColor.withOpacity(0.4),
+                              blurRadius: 8,
+                              offset: Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Icon(
+                          Icons.shopping_bag,
+                          color: Colors.white,
+                          size: 24,
+                        ),
+                      ),
+                      SizedBox(width: 12),
+                      Text(
+                        l10n.aboutThisApp,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: AppColor.primaryColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    l10n.appDescription,
+                    style: TextStyle(
+                      height: 1.6,
+                      fontSize: 15,
+                      color: AppColor.grey,
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  _buildFeatureItem(l10n.feature1, Icons.edit_note),
+                  _buildFeatureItem(l10n.feature2, Icons.add_photo_alternate),
+                  _buildFeatureItem(l10n.feature3, Icons.person),
+                  _buildFeatureItem(l10n.feature4, Icons.palette),
+                  _buildFeatureItem(l10n.feature5, Icons.lock),
+                ],
+              ),
+            ),
+
+            SizedBox(height: 32),
+
+            // Made With Section
+            Container(
+              padding: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [AppColor.primaryColor, AppColor.secondColor],
+                ),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColor.primaryColor.withOpacity(0.4),
+                    blurRadius: 12,
+                    offset: Offset(0, 6),
+                  ),
+                ],
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
                     Icons.code,
-                    color: Theme.of(context).colorScheme.primary,
+                    color: Colors.white,
+                    size: 24,
                   ),
-                  SizedBox(width: 8),
+                  SizedBox(width: 12),
                   Text(
                     l10n.madeWith,
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
+                      color: Colors.white,
                       fontWeight: FontWeight.w600,
+                      fontSize: 16,
                     ),
                   ),
                 ],
               ),
             ),
+
+            SizedBox(height: 40),
           ],
         ),
       ),
     );
   }
 
-  // 🔹 Feature List Item
-  Widget _buildFeatureItem(String text) {
+  Widget _buildFeatureItem(String text, IconData icon) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 2),
-      child: Text(
-        text,
-        style: TextStyle(fontSize: 14, height: 1.4),
+      padding: EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        children: [
+          Container(
+            padding: EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: AppColor.primaryColor.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, size: 16, color: AppColor.primaryColor),
+          ),
+          SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(
+                fontSize: 14,
+                height: 1.4,
+                color: AppColor.grey,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  // 🔹 Social Icon Widget with Hyperlink
-  Widget _buildSocialIcon(IconData icon, String url, BuildContext context) {
+  Widget _buildSocialIcon(IconData icon, String url, Color color, BuildContext context) {
     return InkWell(
       onTap: () => _launchURL(url),
-      child: CircleAvatar(
-        radius: 24,
-        backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+      borderRadius: BorderRadius.circular(15),
+      child: Container(
+        padding: EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(15),
+          border: Border.all(
+            color: color.withOpacity(0.3),
+            width: 2,
+          ),
+        ),
         child: FaIcon(
           icon,
-          color: Theme.of(context).colorScheme.primary,
-          size: 26,
+          color: color,
+          size: 24,
         ),
       ),
     );
   }
 
-  // 🔹 Open URL using url_launcher
   Future<void> _launchURL(String url) async {
     final Uri uri = Uri.parse(url);
     if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
