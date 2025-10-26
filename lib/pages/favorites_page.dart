@@ -6,6 +6,7 @@ import 'package:naseej/main.dart';
 import 'package:naseej/utils/favorites_manager.dart';
 import 'package:naseej/component/product_card.dart';
 import 'package:naseej/operations/notedetailpage.dart';
+import '../core/constant/imgaeasset.dart';
 import '../l10n/generated/app_localizations.dart';
 
 class FavoritesPage extends StatefulWidget {
@@ -200,7 +201,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
         padding: EdgeInsets.all(16),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
-          childAspectRatio: 0.75,
+          childAspectRatio: 0.68, // Changed to match the card ratio: 165/240 = 0.6875
           crossAxisSpacing: 16,
           mainAxisSpacing: 16,
         ),
@@ -241,9 +242,9 @@ class _FavoritesPageState extends State<FavoritesPage> {
               }
             },
             onFavoriteChanged: _onFavoriteChanged,
-            title: note['note_title']?.toString() ?? 'Untitled',
-            content: note['note_content']?.toString() ?? '',
-            imageUrl: imageUrl,
+            title: "Traditional Persian Carpet",
+            content: "Beautiful handmade carpet 5x8 ft",
+            imageAsset: AppImageAsset.cardImage,
           );
         },
       ),

@@ -5,6 +5,7 @@ import 'package:naseej/core/constant/color.dart';
 import 'package:naseej/main.dart';
 import 'package:naseej/component/product_card.dart';
 import 'package:naseej/operations/notedetailpage.dart';
+import '../core/constant/imgaeasset.dart';
 import '../l10n/generated/app_localizations.dart';
 
 class ShopPage extends StatefulWidget {
@@ -139,9 +140,9 @@ class _ShopPageState extends State<ShopPage> {
                 onFavoriteChanged: () {
                   setState(() {});
                 },
-                title: "${note['note_title']}",
-                content: "${note['note_content']}",
-                imageUrl: imageUrl,
+                title: "Traditional Persian Carpet",
+                content: "Beautiful handmade carpet 5x8 ft",
+                imageAsset: AppImageAsset.cardImage,
               );
             },
           );

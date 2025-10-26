@@ -2,17 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:naseej/core/constant/imgaeasset.dart';
 import 'package:naseej/core/constant/color.dart';
-import 'package:naseej/pages/MyHomePage.dart';
+import 'package:naseej/pages/MyHomePage.dart' hide Text;
 import 'package:naseej/pages/explore_page.dart';
 import 'package:naseej/pages/cart_page.dart';
 import 'package:naseej/pages/favorites_page.dart';
 import 'package:naseej/pages/settings_page.dart';
 import 'package:naseej/component/custom_bottom_nav.dart';
+import 'package:naseej/component/app_drawer.dart';
 
 class MainContainer extends StatefulWidget {
   final int initialIndex;
 
-  const MainContainer({Key? key, this.initialIndex = 0}) : super(key: key);
+  const MainContainer({Key? key, this.initialIndex = 2}) : super(key: key); // Default to Home (index 2)
 
   @override
   State<MainContainer> createState() => _MainContainerState();
@@ -22,11 +23,12 @@ class _MainContainerState extends State<MainContainer> {
   late int _currentIndex;
   bool _isLoading = false;
 
+  // New order: Explore (0), Favorites (1), Home (2), Cart (3), Settings (4)
   final List<Widget> _pages = [
-    MyHomePage(),
     ExplorePage(),
-    CartPage(),
     FavoritesPage(),
+    MyHomePage(),
+    CartPage(),
     SettingsPage(),
   ];
 
@@ -57,6 +59,12 @@ class _MainContainerState extends State<MainContainer> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: AppDrawer(
+        onFavoritesChanged: () {
+          // This will trigger a refresh in the current page if needed
+          setState(() {});
+        },
+      ),
       body: Stack(
         children: [
           // Current Page

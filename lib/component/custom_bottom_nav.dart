@@ -47,32 +47,37 @@ class CustomBottomNavBar extends StatelessWidget {
           unselectedFontSize: 11,
           selectedLabelStyle: TextStyle(fontWeight: FontWeight.bold),
           items: [
-            _buildNavItem(
-              icon: Icons.home_outlined,
-              activeIcon: Icons.home,
-              label: 'Home',
-              isActive: currentIndex == 0,
-            ),
+            // Explore - index 0
             _buildNavItem(
               icon: Icons.explore_outlined,
               activeIcon: Icons.explore,
               label: 'Explore',
-              isActive: currentIndex == 1,
+              isActive: currentIndex == 0,
             ),
-            _buildNavItem(
-              icon: Icons.shopping_cart_outlined,
-              activeIcon: Icons.shopping_cart,
-              label: 'Cart',
-              isActive: currentIndex == 2,
-              showBadge: true,
-              badgeCount: 3,
-            ),
+            // Favorites - index 1
             _buildNavItem(
               icon: Icons.favorite_outline,
               activeIcon: Icons.favorite,
               label: 'Favorites',
-              isActive: currentIndex == 3,
+              isActive: currentIndex == 1,
             ),
+            // Home - index 2
+            _buildNavItem(
+              icon: Icons.home_outlined,
+              activeIcon: Icons.home,
+              label: 'Home',
+              isActive: currentIndex == 2,
+            ),
+            // Cart - index 3
+            _buildNavItem(
+              icon: Icons.shopping_cart_outlined,
+              activeIcon: Icons.shopping_cart,
+              label: 'Cart',
+              isActive: currentIndex == 3,
+              showBadge: true,
+              badgeCount: 3,
+            ),
+            // Settings - index 4
             _buildNavItem(
               icon: Icons.settings_outlined,
               activeIcon: Icons.settings,

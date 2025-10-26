@@ -8,9 +8,9 @@ import 'package:naseej/main.dart';
 import 'package:naseej/operations/addNote.dart';
 import 'package:naseej/component/product_card.dart';
 import 'package:naseej/operations/notedetailpage.dart';
-import 'package:naseej/component/app_drawer.dart';
 import 'package:naseej/pages/shop_page.dart';
 import 'package:naseej/utils/favorites_manager.dart';
+import '../core/constant/imgaeasset.dart';
 import '../l10n/generated/app_localizations.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -38,7 +38,6 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
   @override
   void initState() {
     super.initState();
-    // Initialize favorites manager with current user
     final userId = sharedPref.getString("user_id");
     if (userId != null) {
       FavoritesManager.setCurrentUser(userId);
@@ -72,7 +71,7 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
     return response;
   }
 
-  Future<void> _pickAndUploadImage(String noteId, ImageSource source, int? noteIndex) async {
+  Future<void> _pickAndUploadImage(String noteId, ImageSource source) async {
     final l10n = AppLocalizations.of(context);
     try {
       final XFile? pickedFile = await _picker.pickImage(
@@ -93,7 +92,7 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
           imageFile,
         );
 
-        Navigator.of(context).pop(); // Remove overlay
+        Navigator.of(context).pop();
 
         if (response["status"] == "success") {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -171,7 +170,7 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
     );
   }
 
-  Future<void> _removeImage(String noteId, int? noteIndex) async {
+  Future<void> _removeImage(String noteId) async {
     final l10n = AppLocalizations.of(context);
 
     bool? confirm = await showDialog(
@@ -225,15 +224,12 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Scaffold(
-      backgroundColor: AppColor.backgroundcolor,
-      drawer: AppDrawer(
-        onFavoritesChanged: () {
-          setState(() {});
-        },
-      ),
-      body: CustomScrollView(
+    // Remove Scaffold and return only the content
+    return Container(
+      color: isDark ? Color(0xFF1A1614) : AppColor.backgroundcolor,
+      child: CustomScrollView(
         slivers: [
           // Custom App Bar with Gradient
           SliverAppBar(
@@ -309,7 +305,7 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
                     Text(
                       'Handcrafted Egyptian Carpets',
                       style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                        color: AppColor.primaryColor,
+                        color: isDark ? AppColor.goldAccent : AppColor.primaryColor,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -328,7 +324,6 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
 
           // Promotions Section
           SliverToBoxAdapter(
-
             child: Container(
               height: 180,
               margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -344,8 +339,7 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
                       end: Alignment.bottomRight,
                     ),
                     icon: Icons.local_offer,
-                    category: 'All', // ✅ Added
-
+                    category: 'Traditional',
                   ),
                   _buildPromotionCard(
                     title: 'New Arrival',
@@ -357,8 +351,7 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
                       end: Alignment.bottomRight,
                     ),
                     icon: Icons.auto_awesome,
-                    category: 'All', // ✅ Added
-
+                    category: 'Modern',
                   ),
                   _buildPromotionCard(
                     title: 'Free Shipping',
@@ -370,13 +363,13 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
                       end: Alignment.bottomRight,
                     ),
                     icon: Icons.local_shipping,
-                    category: 'All', // ✅ Added
-
+                    category: 'All',
                   ),
                 ],
               ),
             ),
           ),
+
           // Recommended Section
           SliverToBoxAdapter(
             child: Padding(
@@ -393,14 +386,13 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: AppColor.primaryColor,
+                          color: isDark ? AppColor.goldAccent : AppColor.primaryColor,
                         ),
                       ),
                     ],
                   ),
                   TextButton(
                     onPressed: () {
-                      // Navigate to all products
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (context) => ShopPage(category: 'All'),
@@ -410,7 +402,7 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
                     child: Text(
                       'See All',
                       style: TextStyle(
-                        color: AppColor.primaryColor,
+                        color: isDark ? AppColor.goldAccent : AppColor.primaryColor,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -448,7 +440,7 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
                           colors: [AppColor.primaryColor, AppColor.secondColor],
                         )
                             : null,
-                        color: isSelected ? null : AppColor.cardBackground,
+                        color: isSelected ? null : (isDark ? Color(0xFF2C2520) : AppColor.cardBackground),
                         borderRadius: BorderRadius.circular(25),
                         border: Border.all(
                           color: isSelected ? Colors.transparent : AppColor.borderGray,
@@ -470,7 +462,7 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
                           Icon(
                             category['icon'] as IconData,
                             size: 20,
-                            color: isSelected ? Colors.white : AppColor.primaryColor,
+                            color: isSelected ? Colors.white : (isDark ? AppColor.goldAccent : AppColor.primaryColor),
                           ),
                           SizedBox(width: 8),
                           Text(
@@ -478,7 +470,7 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
-                              color: isSelected ? Colors.white : AppColor.primaryColor,
+                              color: isSelected ? Colors.white : (isDark ? AppColor.goldAccent : AppColor.primaryColor),
                             ),
                           ),
                         ],
@@ -580,15 +572,16 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
                             }
                           });
                         },
-                        onImageTap: () {
-                          _showImagePickerDialog(context, note['note_id'].toString(), i);
-                        },
+                        // onImageTap: () {
+                        //   _showImagePickerDialog(context, note['note_id'].toString());
+                        // },
                         onFavoriteChanged: () {
                           setState(() {});
                         },
-                        title: "${note['note_title']}",
-                        content: "${note['note_content']}",
-                        imageUrl: imageUrl,
+                        title: "Traditional Persian Carpet",
+                        content: "Beautiful handmade carpet 5x8 ft",
+                        imageAsset: AppImageAsset.cardImage,
+
                       );
                     },
                     childCount: notes.length,
@@ -599,37 +592,6 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
           ),
         ],
       ),
-
-      // // Floating Action Button with Gradient
-      // floatingActionButton: Container(
-      //   decoration: BoxDecoration(
-      //     shape: BoxShape.circle,
-      //     gradient: LinearGradient(
-      //       colors: [AppColor.primaryColor, AppColor.secondColor],
-      //     ),
-      //     boxShadow: [
-      //       BoxShadow(
-      //         color: AppColor.primaryColor.withOpacity(0.4),
-      //         blurRadius: 12,
-      //         offset: Offset(0, 6),
-      //       ),
-      //     ],
-      //   ),
-      //   child: FloatingActionButton(
-      //     onPressed: () {
-      //       Navigator.of(context).push(
-      //         MaterialPageRoute(builder: (context) => AddNotePage()),
-      //       ).then((result) {
-      //         if (result == true) {
-      //           setState(() {});
-      //         }
-      //       });
-      //     },
-      //     backgroundColor: Colors.transparent,
-      //     elevation: 0,
-      //     child: Icon(Icons.add, size: 32),
-      //   ),
-      // ),
     );
   }
 
@@ -708,153 +670,150 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
     required String subtitle,
     required String description,
     required Gradient gradient,
-    required IconData icon, required String category,
+    required IconData icon,
+    required String category,
   }) {
     return GestureDetector(
-        onTap: () {
-          // Navigate to shop page with category filter
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => ShopPage(category: category),
-            ),
-          );
-        },
-     child: Container(
-      margin: EdgeInsets.symmetric(horizontal: 4),
-      decoration: BoxDecoration(
-        gradient: gradient,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: AppColor.primaryColor.withOpacity(0.3),
-            blurRadius: 15,
-            offset: Offset(0, 8),
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => ShopPage(category: category),
           ),
-        ],
-      ),
-      child: Stack(
-        children: [
-          // Decorative circles
-          Positioned(
-            right: -30,
-            top: -30,
-            child: Container(
-              width: 120,
-              height: 120,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.1),
-              ),
+        );
+      },
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: 4),
+        decoration: BoxDecoration(
+          gradient: gradient,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: AppColor.primaryColor.withOpacity(0.3),
+              blurRadius: 15,
+              offset: Offset(0, 8),
             ),
-          ),
-          Positioned(
-            left: -20,
-            bottom: -20,
-            child: Container(
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.05),
-              ),
-            ),
-          ),
-
-          // Content
-          Padding(
-            padding: EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Icon(icon, color: Colors.white, size: 28),
-                    ),
-                    SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            title,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                          Text(
-                            subtitle,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+          ],
+        ),
+        child: Stack(
+          children: [
+            Positioned(
+              right: -30,
+              top: -30,
+              child: Container(
+                width: 120,
+                height: 120,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white.withOpacity(0.1),
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      description,
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.9),
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
+              ),
+            ),
+            Positioned(
+              left: -20,
+              bottom: -20,
+              child: Container(
+                width: 100,
+                height: 100,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white.withOpacity(0.05),
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(icon, color: Colors.white, size: 28),
                       ),
-                    ),
-                    SizedBox(height: 12),
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
+                      SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              title,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                            Text(
+                              subtitle,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'Shop Now',
-                            style: TextStyle(
+                    ],
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        description,
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.9),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      SizedBox(height: 12),
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'Shop Now',
+                              style: TextStyle(
+                                color: AppColor.primaryColor,
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(width: 6),
+                            Icon(
+                              Icons.arrow_forward,
                               color: AppColor.primaryColor,
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold,
+                              size: 16,
                             ),
-                          ),
-                          SizedBox(width: 6),
-                          Icon(
-                            Icons.arrow_forward,
-                            color: AppColor.primaryColor,
-                            size: 16,
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    )
     );
   }
 
-  void _showImagePickerDialog(BuildContext context, String noteId, int noteIndex) {
+  void _showImagePickerDialog(BuildContext context, String noteId) {
     final l10n = AppLocalizations.of(context);
     showModalBottomSheet(
       context: context,
@@ -895,7 +854,7 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
                     color: AppColor.primaryColor,
                     onTap: () {
                       Navigator.pop(context);
-                      _pickAndUploadImage(noteId, ImageSource.camera, noteIndex);
+                      _pickAndUploadImage(noteId, ImageSource.camera);
                     },
                   ),
                   _buildImageOption(
@@ -904,7 +863,7 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
                     color: AppColor.goldAccent,
                     onTap: () {
                       Navigator.pop(context);
-                      _pickAndUploadImage(noteId, ImageSource.gallery, noteIndex);
+                      _pickAndUploadImage(noteId, ImageSource.gallery);
                     },
                   ),
                   _buildImageOption(
@@ -913,7 +872,7 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
                     color: AppColor.warningColor,
                     onTap: () {
                       Navigator.pop(context);
-                      _removeImage(noteId, noteIndex);
+                      _removeImage(noteId);
                     },
                   ),
                 ],

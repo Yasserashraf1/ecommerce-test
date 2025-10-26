@@ -78,7 +78,7 @@ class _MyAppState extends State<MyApp> {
       LanguageManager.setCurrentUser(userId);
       ThemeManager.setCurrentUser(userId);
       FavoritesManager.setCurrentUser(userId);
-      return "/home";
+      return "/main";
     }
 
     // If onboarding completed, go to login

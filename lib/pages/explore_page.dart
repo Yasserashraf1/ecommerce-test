@@ -6,6 +6,8 @@ import 'package:naseej/main.dart';
 import 'package:naseej/component/product_card.dart';
 import 'package:naseej/operations/notedetailpage.dart';
 
+import '../core/constant/imgaeasset.dart';
+
 class ExplorePage extends StatefulWidget {
   const ExplorePage({Key? key}) : super(key: key);
 
@@ -309,9 +311,9 @@ class _ExplorePageState extends State<ExplorePage> {
                         onFavoriteChanged: () {
                           setState(() {});
                         },
-                        title: "${note['note_title']}",
-                        content: "${note['note_content']}",
-                        imageUrl: imageUrl,
+                        title: "Traditional Persian Carpet",
+                        content: "Beautiful handmade carpet 5x8 ft",
+                        imageAsset: AppImageAsset.cardImage,
                       );
                     },
                     childCount: notes.length,
