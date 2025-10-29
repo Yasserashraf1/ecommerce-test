@@ -77,11 +77,11 @@ class CustomBottomNavBar extends StatelessWidget {
               showBadge: true,
               badgeCount: 3,
             ),
-            // Settings - index 4
+            // Orders - index 4 (CHANGED FROM SETTINGS)
             _buildNavItem(
-              icon: Icons.settings_outlined,
-              activeIcon: Icons.settings,
-              label: 'Settings',
+              icon: Icons.receipt_long_outlined,
+              activeIcon: Icons.receipt_long,
+              label: 'Orders',
               isActive: currentIndex == 4,
             ),
           ],

@@ -294,10 +294,11 @@ class _ProfilePageState extends State<ProfilePage> {
     return Scaffold(
       backgroundColor: isDark ? Color(0xFF1A1614) : AppColor.backgroundcolor,
       body: CustomScrollView(
+        physics: BouncingScrollPhysics(),
         slivers: [
-          // App Bar with Gradient
+          // Enhanced App Bar with better gradient
           SliverAppBar(
-            expandedHeight: 200,
+            expandedHeight: 180, // Reduced height to prevent image cutoff
             floating: false,
             pinned: true,
             backgroundColor: AppColor.primaryColor,
@@ -310,6 +311,13 @@ class _ProfilePageState extends State<ProfilePage> {
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
                   fontSize: 20,
+                  shadows: [
+                    Shadow(
+                      color: Colors.black.withOpacity(0.3),
+                      blurRadius: 4,
+                      offset: Offset(1, 1),
+                    ),
+                  ],
                 ),
               ),
               background: Container(
@@ -320,7 +328,21 @@ class _ProfilePageState extends State<ProfilePage> {
                     colors: [
                       AppColor.primaryColor,
                       AppColor.secondColor,
+                      AppColor.goldAccent,
                     ],
+                    stops: [0.0, 0.6, 1.0],
+                  ),
+                ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                      colors: [
+                        Colors.transparent,
+                        Colors.black.withOpacity(0.1),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -332,85 +354,229 @@ class _ProfilePageState extends State<ProfilePage> {
               padding: EdgeInsets.all(20),
               child: Column(
                 children: [
-                  // Profile Image Section - FIXED DESIGN
-                  Transform.translate(
-                    offset: Offset(0, -50),
-                    child: GestureDetector(
-                      onTap: _showImagePickerDialog,
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          // Gradient border
-                          Container(
-                            width: 130,
-                            height: 130,
+                  // Fixed Profile Image Section - Minimal Shadow
+                  Container(
+                    margin: EdgeInsets.only(bottom: 20),
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        // Background decorative elements
+                        Positioned(
+                          top: -10,
+                          child: Container(
+                            width: 160,
+                            height: 160,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              gradient: LinearGradient(
-                                colors: [AppColor.primaryColor, AppColor.goldAccent],
+                              gradient: RadialGradient(
+                                colors: [
+                                  AppColor.primaryColor.withOpacity(0.1),
+                                  AppColor.goldAccent.withOpacity(0.05),
+                                ],
                               ),
                             ),
                           ),
-                          // White ring
-                          Container(
-                            width: 124,
-                            height: 124,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: isDark ? Color(0xFF1A1614) : Colors.white,
-                            ),
-                          ),
-                          // Image
-                          Container(
-                            width: 120,
-                            height: 120,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              boxShadow: [BoxShadow(color: AppColor.primaryColor.withOpacity(0.3), blurRadius: 20, offset: Offset(0, 10))],
-                            ),
-                            child: ClipOval(
-                              child: isLoadingImage
-                                  ? Container(color: AppColor.backgroundcolor2, child: Center(child: CircularProgressIndicator(color: AppColor.primaryColor, strokeWidth: 3)))
-                                  : (currentProfile != null && currentProfile!['profile_image'] != null && currentProfile!['profile_image'].toString().isNotEmpty)
-                                  ? Image.network(profileImageBaseUrl + currentProfile!['profile_image'], width: 120, height: 120, fit: BoxFit.cover,
-                                  errorBuilder: (_, __, ___) => _buildDefaultAvatar(),
-                                  loadingBuilder: (_, child, progress) => progress == null ? child : Container(color: AppColor.backgroundcolor2, child: Center(child: CircularProgressIndicator(color: AppColor.primaryColor, strokeWidth: 3))))
-                                  : _buildDefaultAvatar(),
-                            ),
-                          ),
-                          // Edit button
-                          Positioned(
-                            bottom: 0,
-                            right: 0,
-                            child: Container(
-                              padding: EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(colors: [AppColor.primaryColor, AppColor.goldAccent]),
-                                shape: BoxShape.circle,
-                                border: Border.all(color: isDark ? Color(0xFF1A1614) : Colors.white, width: 3),
-                                boxShadow: [BoxShadow(color: AppColor.primaryColor.withOpacity(0.4), blurRadius: 8, offset: Offset(0, 4))],
+                        ),
+
+                        // Main profile image container
+                        GestureDetector(
+                          onTap: _showImagePickerDialog,
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              // MINIMAL Outer glow effect - Reduced shadow
+                              Container(
+                                width: 140,
+                                height: 140,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: AppColor.primaryColor.withOpacity(0.15), // Reduced opacity
+                                      blurRadius: 8, // Reduced blur
+                                      spreadRadius: 1, // Reduced spread
+                                      offset: Offset(0, 4), // Reduced offset
+                                    ),
+                                  ],
+                                ),
                               ),
-                              child: Icon(Icons.camera_alt, size: 18, color: Colors.white),
-                            ),
+
+                              // Gradient border
+                              Container(
+                                width: 136,
+                                height: 136,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      AppColor.primaryColor,
+                                      AppColor.goldAccent,
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                ),
+                              ),
+
+                              // White/dark background
+                              Container(
+                                width: 130,
+                                height: 130,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: isDark ? Color(0xFF2C2520) : Colors.white,
+                                  // REMOVED inner shadow completely
+                                ),
+                              ),
+
+                              // Profile image
+                              Container(
+                                width: 126,
+                                height: 126,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: isDark ? Color(0xFF2C2520) : Colors.white,
+                                    width: 2,
+                                  ),
+                                ),
+                                child: ClipOval(
+                                  child: isLoadingImage
+                                      ? Container(
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          AppColor.backgroundcolor2,
+                                          AppColor.backgroundcolor,
+                                        ],
+                                      ),
+                                    ),
+                                    child: Center(
+                                      child: CircularProgressIndicator(
+                                        color: AppColor.primaryColor,
+                                        strokeWidth: 3,
+                                      ),
+                                    ),
+                                  )
+                                      : (currentProfile != null &&
+                                      currentProfile!['profile_image'] != null &&
+                                      currentProfile!['profile_image'].toString().isNotEmpty)
+                                      ? Image.network(
+                                    profileImageBaseUrl + currentProfile!['profile_image'],
+                                    width: 126,
+                                    height: 126,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, __, ___) => _buildDefaultAvatar(),
+                                    loadingBuilder: (_, child, progress) {
+                                      if (progress == null) return child;
+                                      return Container(
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            colors: [
+                                              AppColor.backgroundcolor2,
+                                              AppColor.backgroundcolor,
+                                            ],
+                                          ),
+                                        ),
+                                        child: Center(
+                                          child: CircularProgressIndicator(
+                                            color: AppColor.primaryColor,
+                                            strokeWidth: 3,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  )
+                                      : _buildDefaultAvatar(),
+                                ),
+                              ),
+
+                              // Edit camera button - MINIMAL shadow
+                              Positioned(
+                                bottom: 4,
+                                right: 4,
+                                child: Container(
+                                  padding: EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        AppColor.primaryColor,
+                                        AppColor.secondColor,
+                                      ],
+                                    ),
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: isDark ? Color(0xFF2C2520) : Colors.white,
+                                      width: 3,
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: AppColor.primaryColor.withOpacity(0.2), // Reduced opacity
+                                        blurRadius: 4, // Reduced blur
+                                        offset: Offset(0, 2), // Reduced offset
+                                      ),
+                                    ],
+                                  ),
+                                  child: Icon(
+                                    Icons.camera_alt,
+                                    size: 16,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
 
-                  // Edit Name Section
+                  // User Name Display
                   Container(
+                    margin: EdgeInsets.only(bottom: 24),
+                    child: Column(
+                      children: [
+                        Text(
+                          currentProfile?['user_name'] ?? l10n.unknown,
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? AppColor.goldAccent : AppColor.primaryColor,
+                            fontFamily: 'PlayfairDisplay',
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          sharedPref.getString("user_email") ?? l10n.noEmail,
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: AppColor.grey,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Edit Name Card
+                  Container(
+                    width: double.infinity,
                     padding: EdgeInsets.all(24),
+                    margin: EdgeInsets.only(bottom: 20),
                     decoration: BoxDecoration(
-                      color: isDark ? Color(0xFF2C2520) : AppColor.cardBackground,
+                      color: isDark ? Color(0xFF2C2520) : Colors.white,
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: [
                         BoxShadow(
                           color: AppColor.primaryColor.withOpacity(0.08),
-                          blurRadius: 12,
-                          offset: Offset(0, 4),
+                          blurRadius: 15,
+                          offset: Offset(0, 6),
                         ),
                       ],
+                      border: Border.all(
+                        color: isDark ? AppColor.earthBrown.withOpacity(0.2) : AppColor.borderGray,
+                        width: 1,
+                      ),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -418,18 +584,23 @@ class _ProfilePageState extends State<ProfilePage> {
                         Row(
                           children: [
                             Container(
-                              padding: EdgeInsets.all(10),
+                              padding: EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: AppColor.primaryColor.withOpacity(0.15),
+                                gradient: LinearGradient(
+                                  colors: [
+                                    AppColor.primaryColor,
+                                    AppColor.secondColor,
+                                  ],
+                                ),
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              child: Icon(Icons.edit, color: AppColor.primaryColor, size: 22),
+                              child: Icon(Icons.edit, color: Colors.white, size: 22),
                             ),
                             SizedBox(width: 12),
                             Text(
                               l10n.editYourName,
                               style: TextStyle(
-                                fontSize: 20,
+                                fontSize: 18,
                                 fontWeight: FontWeight.bold,
                                 color: AppColor.primaryColor,
                               ),
@@ -440,44 +611,124 @@ class _ProfilePageState extends State<ProfilePage> {
 
                         Text(
                           l10n.fullName,
-                          style: Theme.of(context).textTheme.titleMedium,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: isDark ? AppColor.goldAccent : AppColor.primaryColor,
+                          ),
                         ),
-                        SizedBox(height: 10),
-                        CustomTextForm(
-                          hintText: l10n.enterFullName,
-                          controller: nameController,
+                        SizedBox(height: 8),
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            color: isDark ? Color(0xFF1A1614) : AppColor.backgroundcolor2,
+                          ),
+                          child: TextFormField(
+                            controller: nameController,
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: isDark ? Colors.white : AppColor.primaryColor,
+                            ),
+                            decoration: InputDecoration(
+                              hintText: l10n.enterFullName,
+                              hintStyle: TextStyle(color: AppColor.grey),
+                              contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                              border: InputBorder.none,
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(color: AppColor.primaryColor, width: 2),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(color: Colors.transparent),
+                              ),
+                            ),
+                          ),
                         ),
 
-                        SizedBox(height: 24),
+                        SizedBox(height: 20),
 
+                        // FIXED BUTTON HEIGHT - Increased from 50 to 56
                         SizedBox(
                           width: double.infinity,
-                          child: Button(
-                            title: l10n.updateName,
-                            isLoading: false,
-                            onpressed: updateProfile,
+                          height: 56, // Increased height to prevent text cutoff
+                          child: ElevatedButton(
+                            onPressed: updateProfile,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColor.primaryColor,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              elevation: 2,
+                              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16), // Added padding
+                            ),
+                            child: isLoading
+                                ? SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                                : Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.check_circle_outline, size: 20),
+                                SizedBox(width: 8),
+                                Text(
+                                  l10n.updateName,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ],
                     ),
                   ),
 
-                  SizedBox(height: 24),
-
-                  // Account Information Section
+                  // Account Information Card
                   Container(
+                    width: double.infinity,
                     padding: EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      color: isDark ? Color(0xFF2C2520) : AppColor.backgroundcolor2,
+                      color: isDark ? Color(0xFF2C2520) : Colors.white,
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: AppColor.borderGray),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColor.primaryColor.withOpacity(0.08),
+                          blurRadius: 15,
+                          offset: Offset(0, 6),
+                        ),
+                      ],
+                      border: Border.all(
+                        color: isDark ? AppColor.earthBrown.withOpacity(0.2) : AppColor.borderGray,
+                        width: 1,
+                      ),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
                           children: [
-                            Icon(Icons.info_outline, color: AppColor.goldAccent, size: 24),
+                            Container(
+                              padding: EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    AppColor.goldAccent,
+                                    AppColor.earthBrown,
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Icon(Icons.person_outline, color: Colors.white, size: 22),
+                            ),
                             SizedBox(width: 12),
                             Text(
                               l10n.accountInformation,
@@ -490,15 +741,33 @@ class _ProfilePageState extends State<ProfilePage> {
                           ],
                         ),
                         SizedBox(height: 20),
-                        _buildInfoRow(l10n.email, sharedPref.getString("user_email") ?? l10n.noEmail),
-                        _buildInfoRow(l10n.created, _formatDate(currentProfile?['created_at'])),
-                        _buildInfoRow(l10n.accountStatus, l10n.active,
-                            valueColor: AppColor.successColor),
+
+                        _buildInfoItem(
+                          icon: Icons.email_outlined,
+                          label: l10n.email,
+                          value: sharedPref.getString("user_email") ?? l10n.noEmail,
+                          iconColor: AppColor.primaryColor,
+                        ),
+                        SizedBox(height: 16),
+                        _buildInfoItem(
+                          icon: Icons.calendar_today_outlined,
+                          label: "memberSince",
+                          value: _formatDate(currentProfile?['created_at']),
+                          iconColor: AppColor.goldAccent,
+                        ),
+                        SizedBox(height: 16),
+                        _buildInfoItem(
+                          icon: Icons.verified_user_outlined,
+                          label: l10n.accountStatus,
+                          value: l10n.active,
+                          valueColor: AppColor.successColor,
+                          iconColor: AppColor.successColor,
+                        ),
                       ],
                     ),
                   ),
 
-                  SizedBox(height: 40),
+                  SizedBox(height: 30),
                 ],
               ),
             ),
@@ -509,47 +778,79 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget _buildDefaultAvatar() {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
-      width: 140,
-      height: 140,
+      width: 126,
+      height: 126,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         gradient: LinearGradient(
-          colors: [AppColor.primaryColor.withOpacity(0.3), AppColor.secondColor.withOpacity(0.3)],
+          colors: [
+            AppColor.primaryColor.withOpacity(0.2),
+            AppColor.secondColor.withOpacity(0.1),
+          ],
         ),
       ),
       child: Icon(
         Icons.person,
-        size: 60,
-        color: AppColor.primaryColor,
+        size: 50,
+        color: AppColor.primaryColor.withOpacity(0.7),
       ),
     );
   }
 
-  Widget _buildInfoRow(String label, String value, {Color? valueColor}) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 10),
+  Widget _buildInfoItem({
+    required IconData icon,
+    required String label,
+    required String value,
+    Color? valueColor,
+    required Color iconColor,
+  }) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Container(
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDark ? Color(0xFF1A1614) : AppColor.backgroundcolor2,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isDark ? AppColor.earthBrown.withOpacity(0.1) : AppColor.borderGray,
+        ),
+      ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            label,
-            style: TextStyle(
-              color: AppColor.grey,
-              fontSize: 15,
-              fontWeight: FontWeight.w500,
+          Container(
+            padding: EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: iconColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
             ),
+            child: Icon(icon, size: 20, color: iconColor),
           ),
-          Flexible(
-            child: Text(
-              value,
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 15,
-                color: valueColor ?? AppColor.primaryColor,
-              ),
-              textAlign: TextAlign.right,
+          SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    color: AppColor.grey,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                SizedBox(height: 4),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 15,
+                    color: valueColor ?? (isDark ? Colors.white : AppColor.primaryColor),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -562,7 +863,11 @@ class _ProfilePageState extends State<ProfilePage> {
     if (dateString == null) return l10n.unknown;
     try {
       DateTime date = DateTime.parse(dateString);
-      return "${date.day}/${date.month}/${date.year}";
+      final months = [
+        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      ];
+      return "${months[date.month - 1]} ${date.day}, ${date.year}";
     } catch (e) {
       return l10n.unknown;
     }

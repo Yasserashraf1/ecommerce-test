@@ -4,7 +4,8 @@ import 'package:naseej/pages/main_container.dart';
 import 'package:naseej/onboarding/onboarding.dart';
 import 'package:get/get.dart';
 import 'package:naseej/pages/shop_page.dart';
-import 'package:naseej/pages/main_container.dart';
+import 'package:naseej/pages/orders_page.dart';
+
 List<GetPage<dynamic>>? routes = [
   // Onboarding route
   GetPage(name: "/onboarding", page: () => const OnBoarding()),
@@ -15,7 +16,9 @@ List<GetPage<dynamic>>? routes = [
 
   // Main container with bottom navigation - starts at Home (index 2)
   GetPage(name: "/main", page: () => const MainContainer(initialIndex: 2)),
+  GetPage(name: "/home", page: () => const MainContainer(initialIndex: 2)), // Alias for backwards compatibility
 
   // Direct page access
   GetPage(name: "/shop", page: () => const ShopPage(category: 'All')),
+  GetPage(name: "/orders", page: () => const OrdersPage()),
 ];

@@ -9,6 +9,9 @@ import 'package:naseej/component/button.dart';
 import 'package:naseej/component/textformfield.dart';
 import 'package:naseej/utils/language_manager.dart';
 import 'package:naseej/utils/theme_manager.dart';
+import 'package:naseej/utils/favorites_manager.dart';
+import 'package:naseej/core/functions/checkinternet.dart';
+import 'package:naseej/core/middleware/internet_middleware.dart';
 
 class login extends StatefulWidget {
   const login({super.key});
@@ -33,6 +36,13 @@ class _loginState extends State<login> {
 
   signIn() async {
     final l10n = AppLocalizations.of(context);
+
+    // CHECK INTERNET FIRST
+    bool hasInternet = await checkInternet();
+    if (!hasInternet) {
+      showNoInternetDialog(context);
+      return;
+    }
 
     if (emailController.text.isEmpty || passController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -67,16 +77,19 @@ class _loginState extends State<login> {
       sharedPref.setString("user_id", userId);
       sharedPref.setString("user_email", response['data']['user_email']);
       sharedPref.setString("user_pass", response['data']['user_pass']);
+      sharedPref.setString("step", "2"); // Mark as logged in
 
       // Set user-specific preferences
       LanguageManager.setCurrentUser(userId);
       ThemeManager.setCurrentUser(userId);
+      FavoritesManager.setCurrentUser(userId);
 
       // Update app with user's saved preferences
       MyApp.of(context)?.changeLanguage(LanguageManager.getCurrentLanguageCode());
       MyApp.of(context)?.changeTheme(ThemeManager.getThemeMode());
 
-      Navigator.of(context).pushNamedAndRemoveUntil("/home", (route) => false);
+      // FIXED: Navigate to /main instead of /home
+      Navigator.of(context).pushNamedAndRemoveUntil("/main", (route) => false);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -180,55 +193,6 @@ class _loginState extends State<login> {
               ),
             ),
             SizedBox(height: 20),
-            // Row(
-            //   children: [
-            //     Expanded(
-            //       child: InkWell(
-            //         onTap: () {},
-            //         child: Container(
-            //           height: 50,
-            //           decoration: BoxDecoration(
-            //             color: Colors.blue[50],
-            //             borderRadius: BorderRadius.circular(12),
-            //             border: Border.all(color: Colors.blue[200]!),
-            //           ),
-            //           child: Icon(Icons.facebook, color: Colors.blue, size: 30),
-            //         ),
-            //       ),
-            //     ),
-            //     SizedBox(width: 10),
-            //     Expanded(
-            //       child: InkWell(
-            //         onTap: () {},
-            //         child: Container(
-            //           height: 50,
-            //           decoration: BoxDecoration(
-            //             color: Colors.red[50],
-            //             borderRadius: BorderRadius.circular(12),
-            //             border: Border.all(color: Colors.red[200]!),
-            //           ),
-            //           child: Icon(Icons.g_mobiledata, color: Colors.red, size: 30),
-            //         ),
-            //       ),
-            //     ),
-            //     SizedBox(width: 10),
-            //     Expanded(
-            //       child: InkWell(
-            //         onTap: () {},
-            //         child: Container(
-            //           height: 50,
-            //           decoration: BoxDecoration(
-            //             color: Colors.grey[100],
-            //             borderRadius: BorderRadius.circular(12),
-            //             border: Border.all(color: Colors.grey[300]!),
-            //           ),
-            //           child: Icon(Icons.apple, color: Colors.black, size: 30),
-            //         ),
-            //       ),
-            //     ),
-            //   ],
-            // ),
-            // SizedBox(height: 60),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [

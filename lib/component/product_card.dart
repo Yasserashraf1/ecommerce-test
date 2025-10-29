@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:naseej/utils/favorites_manager.dart';
 import 'package:naseej/core/constant/color.dart';
 import '../l10n/generated/app_localizations.dart';
+import 'package:naseej/pages/product_details_page.dart';
 
 class ProductCard extends StatefulWidget {
   final void Function() onTap;
@@ -94,8 +95,21 @@ class _ProductCardState extends State<ProductCard> {
     if (_disposed) return SizedBox.shrink();
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
+    // The onTap callback is now defined inside the build method
+    // to have access to the context for navigation.
     return GestureDetector(
-      onTap: widget.onTap,
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => ProductDetailsPage(
+              noteId: widget.noteId,
+              title: _getProductName(),
+              content: widget.content, // Pass the full content
+              imageUrl: widget.imageAsset,
+            ),
+          ),
+        );
+      },
       child: Container(
         width: 165,
         height: 240,

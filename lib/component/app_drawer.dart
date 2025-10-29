@@ -12,6 +12,7 @@ import 'package:naseej/pages/profile_page.dart';
 import 'package:naseej/utils/language_manager.dart';
 import 'package:naseej/utils/theme_manager.dart';
 import '../l10n/generated/app_localizations.dart';
+import '../pages/address/addresspage.dart';
 
 class AppDrawer extends StatefulWidget {
   final VoidCallback? onFavoritesChanged;
@@ -454,8 +455,25 @@ class _AppDrawerState extends State<AppDrawer> {
                   ),
 
                   _buildMenuItem(
+                    icon: Icons.home_outlined,
+                    title: "Address",
+                    iconColor: AppColor.goldAccent,
+                    onTap: () async {
+                      Navigator.pop(context);
+                      final result = await Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => AddressPage(),
+                        ),
+                      );
+                      if (result == true && widget.onFavoritesChanged != null) {
+                        widget.onFavoritesChanged!();
+                      }
+                    },
+                  ),
+
+                  _buildMenuItem(
                     icon: Icons.info_outline,
-                    title: l10n.aboutCreator,
+                    title: "About Us",
                     iconColor: AppColor.earthBrown,
                     onTap: () {
                       Navigator.pop(context);

@@ -5,6 +5,8 @@ import 'package:naseej/utils/language_manager.dart';
 import 'package:naseej/utils/theme_manager.dart';
 import 'package:naseej/l10n/generated/app_localizations.dart';
 
+import 'payment/payment_methods_page.dart';
+
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
 
@@ -325,16 +327,12 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
 
           _buildListTile(
-            icon: Icons.backup_outlined,
-            title: l10n.backupSync,
-            subtitle: l10n.backupToCloud,
+            icon: Icons.payment_outlined,
+            title: "Payment Methods",
+            subtitle: "Manage Your Payment Methods",
             onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(l10n.featureComingSoon),
-                  backgroundColor: AppColor.goldAccent,
-                  behavior: SnackBarBehavior.floating,
-                ),
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => const PaymentMethodsPage()),
               );
             },
             color: AppColor.earthBrown,
@@ -414,7 +412,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 Icon(Icons.shopping_bag, size: 48, color: Colors.white),
                 SizedBox(height: 12),
                 Text(
-                  l10n.appTitle,
+                  "Naseej",
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
